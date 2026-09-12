@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Кейсы</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+body { background:#0d1117; color:#e6edf3; min-height:100vh; }
+
+/* ---- Экраны ---- */
+.screen { display:none; }
+.screen.active { display:block; }
+
+/* ---- Авторизация ---- */
+.auth-wrap {
+    display:flex; justify-content:center; align-items:center;
+    min-height:100vh; padding:20px;
+}
+.auth-card {
+    background:#161b22; padding:40px; border-radius:12px;
+    border:1px solid #30363d; width:100%; max-width:400px;
+}
+.auth-card h1 { margin-bottom:24px; text-align:center; font-size:24px; }
+.form-group { margin-bottom:16px; }
+.form-group label { display:block; margin-bottom:6px; color:#8b949e; font-size:14px; }
+.form-group input {
+    width:100%; padding:12px; background:#0d1117; border:1px solid #30363d;
+    border-radius:6px; color:#e6edf3; font-size:14px; transition:border-color .2s;
+}
+.form-group input:focus { outline:none; border-color:#58a6ff; }
+.btn-primary {
+    width:100%; padding:12px; background:#238636; border:none; border-radius:6px;
+    color:#fff; font-size:14px; font-weight:600; cursor:pointer;
+    transition:background .2s; margin-top:8px;
+}
+.btn-primary:hover { background:#2ea043; }
+.btn-primary:disabled { opacity:.6; cursor:not-allowed; }
+.switch-link { text-align:center; margin-top:16px; color:#8b949e; font-size:14px; }
+.switch-link a { color:#58a6ff; text-decoration:none; cursor:pointer; }
+.switch-link a:hover { text-decoration:underline; }
+.message {
+    margin-top:16px; padding:10px; border-radius:6px; font-size:14px;
+    text-align:center; display:none;
+}
+.message.error { background:rgba(248,81,73,.15); color:#f85149; border:1px solid rgba(248,81,73,.4); display:block; }
+.message.success { background:rgba(46,160,67,.15); color:#3fb950; border:1px solid rgba(46,160,67,.4); display:block; }
+
+/* ---- Dashboard ---- */
+.topbar {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:16px 32px; background:#161b22; border-bottom:1px solid #30363d;
+    position:sticky; top:0; z-index:10;
+}
+.balance {
+    display:flex; align-items:center; gap:10px; background:#0d1117;
+    padding:10px 20px; border-radius:8px; border:1px solid #30363d;
+}
+.balance-label { color:#8b949e; font-size:14px; }
+.balance-value { color:#3fb950; font-size:18px; font-weight:700; }
+.user-info { display:flex; align-items:center; gap:16px; }
+.user-info span { color:#8b949e; font-size:14px; }
+.btn-logout {
+    padding:8px 16px; background:transparent; border:1px solid #30363d;
+    border-radius:6px; color:#e6edf3; cursor:pointer; font-size:14px;
+    transition:all .2s;
+}
+.btn-logout:hover { background:#21262d; border-color:#8b949e; }
+.content { padding:32px; }
+.content h1 { font-size:22px; margin-bottom:16px; }
+.content p { color:#8b949e; }
+
+/* ---- Загрузка ---- */
+.loader {
+    position:fixed; inset:0; background:rgba(13,17,23,.85);
+    display:none; justify-content:center; align-items:center; z-index:999;
+}
+.loader.active { display:flex; }
+.spinner {
+    width:40px; height:40px; border:3px solid #30363d;
+    border-top-color:#58a6ff; border-radius:50%;
+    animation:spin .8s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- ============ ЭКРАН: ВХОД ============ -->
+<div id="screen-login" class="screen active">
+    <div class="auth-wrap">
+        <div class="auth-card">
+            <h1>Вход</h1>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" id="loginPassword" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn-primary">Войти</button>
+            </form>
+            <p class="switch-link">Нет аккаунта? <a data-nav="register">Зарегистрироваться</a></p>
+            <div id="loginMessage" class="message"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ============ ЭКРАН: РЕГИСТРАЦИЯ ============ -->
+<div id="screen-register" class="screen">
+    <div class="auth-wrap">
+        <div class="auth-card">
+            <h1>Регистрация</h1>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="regEmail" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" id="regPassword" required minlength="6" autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label>Подтверждение пароля</label>
+                    <input type="password" id="regPasswordConfirm" required minlength="6" autocomplete="new-password">
+                </div>
+                <button type="submit" class="btn-primary">Зарегистрироваться</button>
+            </form>
+            <p class="switch-link">Уже есть аккаунт? <a data-nav="login">Войти</a></p>
+            <div id="registerMessage" class="message"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ============ ЭКРАН: ДАШБОРД ============ -->
+<div id="screen-dashboard" class="screen">
+    <header class="topbar">
+        <div class="balance">
+            <span class="balance-label">Баланс:</span>
+            <span class="balance-value" id="balanceValue">0 ₽</span>
+        </div>
+        <div class="user-info">
+            <span id="userEmail"></span>
+            <button id="logoutBtn" class="btn-logout">Выйти</button>
+        </div>
+    </header>
+    <main class="content">
+        <h1>Кейсы</h1>
+        <p>Здесь позже будут кейсы...</p>
+    </main>
+</div>
+
+<!-- ============ Загрузка ============ -->
+<div id="loader" class="loader"><div class="spinner"></div></div>
+
+<script>
+// ============================================================
+//  1. НАСТРОЙКИ — заполни своими данными
+// ============================================================
+const CONFIG = {
+    // Токен доступа к приватному репозиторию с данными
+    token: 'github_pat_XXXXXXXXXXXXXXXXXXXXXXXX',
+
+    // Владелец репозитория с данными (username или организация)
+    owner: 'pojtareydena-create',
+
+    // Имя ПРИВАТНОГО репозитория для данных
+    repo: 'StyleCaseData',
+
+    // Ветка
+    branch: 'main',
+
+    // Названия файлов (создаются автоматически)
+    files: {
+        users: 'users.json',
+        cases: 'cases.json'
+    }
+};
+
+// ============================================================
+//  2. УТИЛИТЫ
+// ============================================================
+const $ = (id) => document.getElementById(id);
+
+function showLoader(on) {
+    $('loader').classList.toggle('active', on);
+}
+
+function showMessage(id, text, type = 'error') {
+    const el = $(id);
+    el.textContent = text;
+    el.className = `message ${type}`;
+    setTimeout(() => { el.className = 'message'; }, 5000);
+}
+
+function nav(screen) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    $(`screen-${screen}`).classList.add('active');
+}
+
+// Простой роутинг по ссылкам data-nav
+document.querySelectorAll('[data-nav]').forEach(a => {
+    a.addEventListener('click', (e) => {
+        e.preventDefault();
+        nav(a.dataset.nav);
+    });
+});
+
+// SHA-256 хеш пароля
+async function hashPassword(password) {
+    const data = new TextEncoder().encode(password + '::case_site_salt_v1');
+    const buf = await crypto.subtle.digest('SHA-256', data);
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Base64 <-> UTF-8 (для GitHub API)
+function b64Encode(str) {
+    return btoa(unescape(encodeURIComponent(str)));
+}
+function b64Decode(str) {
+    return decodeURIComponent(escape(atob(str.replace(/\s/g, ''))));
+}
+
+// ============================================================
+//  3. GITHUB API — работа с приватным репозиторием данных
+// ============================================================
+const GitHub = {
+    baseUrl() {
+        return `https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/contents`;
+    },
+
+    headers() {
+        return {
+            'Authorization': `Bearer ${CONFIG.token}`,
+            'Accept': 'application/vnd.github+json',
+            'X-GitHub-Api-Version': '2022-11-28'
+        };
+    },
+
+    // Получить файл. Если нет — вернёт null (не ошибку)
+    async getFile(path) {
+        const url = `${this.baseUrl()}/${path}?ref=${CONFIG.branch}&t=${Date.now()}`;
+        const res = await fetch(url, { headers: this.headers() });
+
+        if (res.status === 404) return null;  // Файла ещё нет
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.message || `GitHub ${res.status}`);
+        }
+        const data = await res.json();
+        return {
+            content: JSON.parse(b64Decode(data.content)),
+            sha: data.sha
+        };
+    },
+
+    // Создать или обновить файл
+    async saveFile(path, content, sha = null) {
+        const body = {
+            message: sha ? `Update ${path}` : `Create ${path}`,
+            content: b64Encode(JSON.stringify(content, null, 2)),
+            branch: CONFIG.branch
+        };
+        if (sha) body.sha = sha;
+
+        const res = await fetch(`${this.baseUrl()}/${path}`, {
+            method: 'PUT',
+            headers: { ...this.headers(), 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.message || `GitHub ${res.status}`);
+        }
+        return await res.json();
+    },
+
+    // Универсальный "получить список пользователей" (создаёт файл, если нет)
+    async getUsers() {
+        const file = await this.getFile(CONFIG.files.users);
+        if (file) return file;
+        // Файла нет — вернём пустой массив без sha (создастся при первом сохранении)
+        return { content: [], sha: null };
+    }
+};
+
+// ============================================================
+//  4. СЕССИЯ (localStorage)
+// ============================================================
+const Session = {
+    save(user) {
+        localStorage.setItem('currentUser', JSON.stringify({
+            email: user.email,
+            balance: user.balance ?? 0
+        }));
+    },
+    get() {
+        try { return JSON.parse(localStorage.getItem('currentUser') || 'null'); }
+        catch { return null; }
+    },
+    clear() {
+        localStorage.removeItem('currentUser');
+    }
+};
+
+// ============================================================
+//  5. РЕГИСТРАЦИЯ
+// ============================================================
+$('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = $('regEmail').value.trim().toLowerCase();
+    const password = $('regPassword').value;
+    const passwordConfirm = $('regPasswordConfirm').value;
+    const btn = e.target.querySelector('button');
+
+    if (!email || !password) return showMessage('registerMessage', 'Заполните все поля');
+    if (password.length < 6) return showMessage('registerMessage', 'Пароль минимум 6 символов');
+    if (password !== passwordConfirm) return showMessage('registerMessage', 'Пароли не совпадают');
+
+    btn.disabled = true;
+    btn.textContent = 'Загрузка...';
+    showLoader(true);
+
+    try {
+        const { content: users, sha } = await GitHub.getUsers();
+
+        if (users.find(u => u.email === email)) {
+            showMessage('registerMessage', 'Такой email уже зарегистрирован');
+            return;
+        }
+
+        const passwordHash = await hashPassword(password);
+        users.push({
+            email,
+            passwordHash,
+            balance: 0,
+            createdAt: new Date().toISOString()
+        });
+
+        await GitHub.saveFile(CONFIG.files.users, users, sha);
+
+        showMessage('registerMessage', 'Аккаунт создан! Перенаправляем...', 'success');
+        setTimeout(() => {
+            nav('login');
+            $('loginEmail').value = email;
+        }, 1200);
+    } catch (err) {
+        console.error(err);
+        showMessage('registerMessage', 'Ошибка: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Зарегистрироваться';
+        showLoader(false);
+    }
+});
+
+// ============================================================
+//  6. ВХОД
+// ============================================================
+$('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = $('loginEmail').value.trim().toLowerCase();
+    const password = $('loginPassword').value;
+    const btn = e.target.querySelector('button');
+
+    btn.disabled = true;
+    btn.textContent = 'Вход...';
+    showLoader(true);
+
+    try {
+        const { content: users } = await GitHub.getUsers();
+        const user = users.find(u => u.email === email);
+        if (!user) {
+            showMessage('loginMessage', 'Неверный email или пароль');
+            return;
+        }
+
+        const passwordHash = await hashPassword(password);
+        if (user.passwordHash !== passwordHash) {
+            showMessage('loginMessage', 'Неверный email или пароль');
+            return;
+        }
+
+        Session.save(user);
+        enterDashboard();
+    } catch (err) {
+        console.error(err);
+        showMessage('loginMessage', 'Ошибка: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Войти';
+        showLoader(false);
+    }
+});
+
+// ============================================================
+//  7. ДАШБОРД
+// ============================================================
+async function enterDashboard() {
+    const session = Session.get();
+    if (!session) { nav('login'); return; }
+
+    $('userEmail').textContent = session.email;
+    $('balanceValue').textContent = (session.balance ?? 0) + ' ₽';
+    nav('dashboard');
+
+    // Подтягиваем актуальный баланс из GitHub
+    try {
+        const { content: users } = await GitHub.getUsers();
+        const user = users.find(u => u.email === session.email);
+        if (user) {
+            $('balanceValue').textContent = (user.balance ?? 0) + ' ₽';
+            Session.save(user);
+        }
+    } catch (err) {
+        console.warn('Не удалось обновить баланс:', err.message);
+    }
+}
+
+$('logoutBtn').addEventListener('click', () => {
+    Session.clear();
+    $('loginForm').reset();
+    nav('login');
+});
+
+// ============================================================
+//  8. СТАРТ
+// ============================================================
+(function init() {
+    const session = Session.get();
+    if (session) enterDashboard();
+    else nav('login');
+})();
+</script>
+</body>
+</html>
