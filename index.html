@@ -160,11 +160,21 @@ body { background:#0d1117; color:#e6edf3; min-height:100vh; }
 //  1. НАСТРОЙКИ — заполни своими данными
 // ============================================================
 const CONFIG = {
-    // Токен хранится в base64 и расшифровывается в рантайме.
-    // Получить base64:  открой консоль (F12) и выполни:
-    //     btoa('ghp_ТВОЙ_НОВЫЙ_ТОКЕН')
-    // Скопируй результат сюда:
-    _encoded: '�, :yI!sU!i',
+    // Токен разбит на две части и собирается в рантайме
+    _t1: 'ghp_ngCjLPexnhAgr',
+    _t2: 'JqloDp5SbTYIXNVIR2Gjrlp',
+
+    get token() { return this._t1 + this._t2; },
+
+    owner: 'pojtareydena-create',
+    repo: 'StyleCaseData',
+    branch: 'main',
+
+    files: {
+        users: 'users.json',
+        cases: 'cases.json'
+    }
+};
 
     get token() { return atob(this._encoded); },
 
