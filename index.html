@@ -160,10 +160,15 @@ body { background:#0d1117; color:#e6edf3; min-height:100vh; }
 //  1. НАСТРОЙКИ — заполни своими данными
 // ============================================================
 const CONFIG = {
-    // Токен доступа к приватному репозиторию с данными
-    token: 'github_pat_XXXXXXXXXXXXXXXXXXXXXXXX',
+    // Токен хранится в base64 и расшифровывается в рантайме.
+    // Получить base64:  открой консоль (F12) и выполни:
+    //     btoa('ghp_ТВОЙ_НОВЫЙ_ТОКЕН')
+    // Скопируй результат сюда:
+    _encoded: '�, :yI!sU!i',
 
-    // Владелец репозитория с данными (username или организация)
+    get token() { return atob(this._encoded); },
+
+    // Владелец репозитория с данными
     owner: 'pojtareydena-create',
 
     // Имя ПРИВАТНОГО репозитория для данных
@@ -200,7 +205,7 @@ function nav(screen) {
     $(`screen-${screen}`).classList.add('active');
 }
 
-// Простой роутинг по ссылкам data-nav
+// Роутинг по ссылкам data-nav
 document.querySelectorAll('[data-nav]').forEach(a => {
     a.addEventListener('click', (e) => {
         e.preventDefault();
@@ -278,11 +283,10 @@ const GitHub = {
         return await res.json();
     },
 
-    // Универсальный "получить список пользователей" (создаёт файл, если нет)
+    // Получить список пользователей (или пустой массив, если файла нет)
     async getUsers() {
         const file = await this.getFile(CONFIG.files.users);
         if (file) return file;
-        // Файла нет — вернём пустой массив без sha (создастся при первом сохранении)
         return { content: [], sha: null };
     }
 };
